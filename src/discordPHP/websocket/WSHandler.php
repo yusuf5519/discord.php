@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace discordPHP\websocket;
 
 use discordPHP\discord\user\Client;
+use discordPHP\event\client\ClientReadyEvent;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\Message;
@@ -135,10 +136,12 @@ class WSHandler{
         $this->cancelTimer($this->heartbeatAckTimer);
 
         if(!$this->discord->isClosing()){
-            // TODO : Event
+            Console::log('Websocket closed. Reason: ' . $reason);
+
             if($op === Op::CLOSE_AUTHENTICATION_FAILED){
                 Console::log("Token is invalid!");
             }else{
+                Console::log('Starting reconnect');
                 $this->reconnecting = true;
                 $this->connect();
             }
@@ -249,8 +252,13 @@ class WSHandler{
             $this->reconnecting = false;
         }else{
             $this->sessionId = $data['session_id'];
-            $this->discord->setClient(new Client($data, $this));
+            $this->discord->setClient($client = new Client($data, $this));
+            $this->discord->getEventManager()->callEvent(new ClientReadyEvent($client));
         }
+    }
+
+    public function handleInvalidSession() : void{
+        $this->identify(false);
     }
 
     /**

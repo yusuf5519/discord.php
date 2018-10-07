@@ -23,6 +23,7 @@ namespace discordPHP;
 use discordPHP\discord\guild\Guild;
 use discordPHP\discord\user\Client;
 use discordPHP\discord\user\User;
+use discordPHP\event\EventManager;
 use discordPHP\utils\Collection;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
@@ -61,6 +62,8 @@ class Discord{
     private $client;
     /** @var Collection */
     private $guilds, $users;
+    /** @var EventManager */
+    private $eventManager;
 
     public function __construct(){
         self::$api = $this;
@@ -77,8 +80,10 @@ class Discord{
         ini_set("display_errors", '1');
         ini_set("display_startup_errors", '1');
         ini_set("default_charset", "utf-8");
+        ini_set("memory_limit", '-1');
 
         $this->loop = LoopFactory::create();
+        $this->eventManager = new EventManager($this);
         $this->guilds = $this->users = new Collection();
     }
 
@@ -113,6 +118,13 @@ class Discord{
      */
     public function getLoop(){
         return $this->loop;
+    }
+
+    /**
+     * @return EventManager
+     */
+    public function getEventManager() : EventManager{
+        return $this->eventManager;
     }
 
     /**

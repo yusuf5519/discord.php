@@ -27,11 +27,25 @@ use discordPHP\websocket\WSHandler;
 
 class Client extends User{
 
+    public const STATUS_ONLINE = 'online';
+    public const STATUS_OFFLINE = 'offline';
+    public const STATUS_DND = 'dnd';
+    public const STATUS_IDLE = 'idle';
+    public const STATUS_INVISIBLE = 'invisible';
+
     /**
      * The guilds the user is in
      * @var string[] guildIds[]
      */
     private $guilds;
+    /** @var array */
+    private $presence = [
+        'status' => self::STATUS_ONLINE,
+        'afk' => false,
+        'game' => null,
+        'since' => null
+    ];
+
     /** @var WSHandler */
     private $ws;
 
@@ -45,15 +59,32 @@ class Client extends User{
     }
 
     public function setActivity(Activity $activity) : void{
+        $this->setStatus($this->presence['status'], $activity);
+    }
+
+    /**
+     * @param string $status The user's new status
+     * @param Activity|null $activity The user's new activity
+     * @param bool $afk Whether or not the client is afk
+     * @param int $since Unix time (in milliseconds) of when the client went idle, or null if the client is not idle
+     */
+    public function setStatus(string $status, ?Activity $activity = null, bool $afk = null, int $since = null) : void{
         $payload = [
             'op' => Op::STATUS_UPDATE,
             'd' => [
-                'game' => $activity
+                'status' => $status,
+                'afk' => $afk ?? $this->presence['afk'],
+                'since' => $since ?? $this->presence['since']
             ]
         ];
 
-        var_dump(json_encode($payload));
+        if($activity !== null){
+            $payload['d']['game'] = $activity;
+        }else{
+            $payload['d']['game'] = $this->presence['game'] ?? null;
+        }
 
+        $this->presence = $payload['d'];
         $this->ws->send($payload);
     }
 
