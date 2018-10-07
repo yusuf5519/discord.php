@@ -1,0 +1,8 @@
+# IntelliJ project files
+.idea
+
+# Composer
+vendor
+composer.phar
+composer.lock
+bin/
