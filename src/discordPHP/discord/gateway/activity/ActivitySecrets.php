@@ -25,10 +25,18 @@ class ActivitySecrets implements \JsonSerializable{
     /** @var string|null */
     private $join, $spectate, $match;
 
-    public function __construct(array $data){
-        $this->join = $data['join'] ?? null;
-        $this->spectate = $data['spectate'] ?? null;
-        $this->match = $data['match'] ?? null;
+    public function __construct(?string $join = null, ?string $spectate = null, ?string $match = null){
+        $this->join = $join;
+        $this->spectate = $spectate;
+        $this->match = $match;
+    }
+
+    public static function fromData(array $data) : ActivitySecrets{
+        return new ActivitySecrets(
+            $data['join'] ?? null,
+            $data['spectate'] ?? null,
+            $data['match'] ?? null
+        );
     }
 
     /**

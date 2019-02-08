@@ -27,10 +27,18 @@ class ActivityParty implements \JsonSerializable{
     /** @var int */
     private $currentSize, $maxSize;
 
-    public function __construct(array $data){
-        $this->id = $data['id'];
-        $this->currentSize = $data['size']['current_size'];
-        $this->maxSize = $data['size']['max_size'];
+    public function __construct(int $id, int $currentSize, int $maxSize){
+        $this->id = $id;
+        $this->currentSize = $currentSize;
+        $this->maxSize = $maxSize;
+    }
+
+    public static function fromData(array $data) : ActivityParty{
+        return new ActivityParty(
+            $data['id'],
+            $data['size']['current_size'],
+            $data['size']['max_size']
+        );
     }
 
     /**

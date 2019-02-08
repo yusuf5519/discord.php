@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace discordPHP\discord\gateway\activity;
 
+/**
+ * https://discordapp.com/developers/docs/topics/gateway#activity-object
+ */
 class Activity implements \JsonSerializable{
 
     /* TYPE */
@@ -60,28 +63,48 @@ class Activity implements \JsonSerializable{
     /** @var int */
     private $flags;
 
-    public function __construct(array $data){
-        $this->name = $data['name'];
-        $this->type = $data['type'];
-        $this->url = $data['url'] ?? null;
-        $this->applicationId = $data['application_id'] ?? null;
-        $this->details = $data['details'] ?? null;
-        $this->state = $data['state'] ?? null;
-        $this->instance = $data['instance'] ?? null;
-        $this->flags = $data['flags'] ?? null;
+    public function __construct(string $name, int $type, ?string $url = null, ?ActivityTimestamp $timestamp = null, string $applicationId = '', ?string $details = null, ?string $state = null, ?ActivityParty $party = null, ?ActivityAssets $assets = null, ?ActivitySecrets $secrets = null, bool $instance = false, int $flags = 0){
+        $this->name = $name;
+        $this->type = $type;
+        $this->url = $url;
+        $this->timestamp = $timestamp;
+        $this->applicationId = $applicationId;
+        $this->details = $details;
+        $this->state = $state;
+        $this->party = $party;
+        $this->assets = $assets;
+        $this->secrets = $secrets;
+        $this->instance = $instance;
+        $this->flags = $flags;
+    }
 
+    public static function fromData(array $data) : Activity{
         if(isset($data['party'])){
-            $this->party = new ActivityParty($data['party']);
+            $party = ActivityParty::fromData($data['party']);
         }
         if(isset($data['assets'])){
-            $this->assets = new ActivityAssets($data['assets']);
+            $assets = ActivityAssets::fromData($data['assets']);
         }
         if(isset($data['secrets'])){
-            $this->secrets = new ActivitySecrets($data['secrets']);
+            $secrets = ActivitySecrets::fromData($data['secrets']);
         }
         if(isset($data['timestamps'])){
-            $this->timestamp = new ActivityTimestamp($data['timestamps']);
+            $timestamp = ActivityTimestamp::fromData($data['timestamps']);
         }
+        return new Activity(
+            $data['name'],
+            $data['type'],
+            $data['url'] ?? null,
+            $timestamp ?? null,
+            $data['application_id'] ?? '',
+            $data['details'] ?? null,
+            $data['state'] ?? null,
+            $party ?? null,
+            $assets ?? null,
+            $secrets ?? null,
+            $data['instance'] ?? false,
+            $data['flags'] ?? 0
+        );
     }
 
     /**

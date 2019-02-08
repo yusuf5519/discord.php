@@ -27,11 +27,20 @@ class ActivityAssets implements \JsonSerializable{
     /** @var string|null */
     private $largeImage, $smallImage;
 
-    public function __construct(array $data){
-        $this->largeImage = $data['large_image'] ?? null;
-        $this->largeText = $data['large_text'] ?? null;
-        $this->smallImage = $data['small_image'] ?? null;
-        $this->smallText = $data['small_text'] ?? null;
+    public function __construct(?string $largeImage = null, ?string $largeText = null, ?string $smallImage = null, ?string $smallText = null){
+        $this->largeImage = $largeImage;
+        $this->largeText = $largeText;
+        $this->smallImage = $smallImage;
+        $this->smallText = $smallText;
+    }
+
+    public static function fromData(array $data) : ActivityAssets{
+        return new ActivityAssets(
+            $data['large_image'] ?? null,
+            $data['large_text'] ?? null,
+            $data['small_image'] ?? null,
+            $data['small_text'] ?? null
+        );
     }
 
     /**

@@ -48,7 +48,7 @@ class PresenceUpdate{
     public function __construct(array $data){
         $this->userId = $data['user']['id'];
         $this->status = $data['status'];
-        $this->activity = $data['game'] !== null ? new Activity($data['game']) : null;
+        $this->activity = $data['game'] !== null ? Activity::fromData($data['game']) : null;
         $this->roles = $data['roles'] ?? [];
         $this->nick = $data['nick'] ?? null;
         $this->guildId = $data['guild_id'] ?? null;

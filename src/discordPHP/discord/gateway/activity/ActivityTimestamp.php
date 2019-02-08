@@ -22,18 +22,25 @@ namespace discordPHP\discord\gateway\activity;
 
 class ActivityTimestamp implements \JsonSerializable{
 
-    /** @var int */
+    /** @var int seconds */
     private $start, $end;
 
-    public function __construct(array $data){
-        $this->start = $data['start'] ?? 0;
-        if($this->start > 0){
-            $this->start /= 1000; // milliseconds to seconds
+    public function __construct(int $start, int $end){
+        $this->start = $start;
+        $this->end = $end;
+    }
+
+    public static function fromData(array $data) : ActivityTimestamp{
+        $start = $data['start'] ?? 0;
+        if($start > 0){
+            $start /= 1000; // milliseconds to seconds
         }
-        $this->end = $data['end'] ?? 0;
-        if($this->end > 0){
-            $this->end /= 1000; // milliseconds to seconds
+        $end = $data['end'] ?? 0;
+        if($end > 0){
+            $end /= 1000; // milliseconds to seconds
         }
+
+        return new ActivityTimestamp($start, $end);
     }
 
     /**
